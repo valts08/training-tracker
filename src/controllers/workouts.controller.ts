@@ -1,6 +1,33 @@
 import { NextFunction, Request, Response } from 'express';
-import Workouts from '../models/workouts.model';
+import z from 'zod'
 import createWorkoutService from '../services/workouts.services';
+
+const Exercises = z.object({
+  id: z.number(),
+  name: z.string(),
+  muscle_group: z.string(),
+  equipment: z.string(),
+  sets: z.number().min(1),
+  reps: z.number().min(1),
+  weight_kg: z.number(),
+  rest_seconds: z.number().min(1),
+  notes: z.string()
+})
+
+const Workout = z.object({
+  id: z.number(),
+  author_id: z.string().min(15),
+  title: z.string().min(10),
+  category: z.string(),
+  duration_minutes: z.number().min(1),
+  difficulty: z.string(),
+  exercise_count: z.number().min(1),
+  rest_between_sets_seconds: z.number().min(30),
+  equipment: z.array(z.string()),
+  exercises: z.array(Exercises)
+})
+
+type Workouts = z.infer<typeof Workout>
 
 let workouts = [
 
@@ -77,9 +104,11 @@ const createWorkout = async (req: Request, res: Response, next: NextFunction) =>
 
     const workout = await createWorkoutService(req.body)
 
-    workouts.push(workout)
+    const zoddedWorkout = Workout.parse(workout)
+
+    workouts.push(zoddedWorkout)
     
-    res.status(200).send({ workout: workout, message: "Workout added to the list!" })
+    res.status(200).send({ workout: zoddedWorkout, message: "Workout added to the list!" })
 }
 
 const deleteWorkout = (req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,13 @@
 import { NextFunction, Request, Response } from "express" 
-import Users from "../models/users.model"
+import z from 'zod'
 import createUserService from "../services/users.services"
+
+const User = z.object({
+  id: z.number().min(3),
+  username: z.string().min(10)
+})
+
+type User = z.infer<typeof User>
 
 let users = [
   {
@@ -25,7 +32,9 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const user = await createUserService(req.body)
 
-    users.push(user)
+    const zoddedUser = User.parse(user)
+
+    users.push(zoddedUser)
 
     res.status(200).send({ users, message: "User added successfully" })
     // empty objects can also be added
@@ -34,16 +43,16 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 const editUser = (req: Request, res: Response, next: NextFunction) => {
     const userId = parseInt(req.params.id as string) // not sure why this needs to be cast as a string, but want to check later
 
-    let editIndex = users.findIndex((user: Users) => user.id === userId)
+    let editIndex = users.findIndex((user: User) => user.id === userId)
 
     if (editIndex == -1) {
         res.status(400).send({ message: `User with id ${userId} not found` })
     }
 
-    users[editIndex] = {
+    users[editIndex] = User.parse({
         id: userId,
         username: req.body.username
-    }
+    })
 
     res.status(200).send({ users, message: "Username edited successfully" })
 }
