@@ -1,33 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod'
 import createWorkoutService from '../services/workouts.services';
+import { Workout, WorkoutVal } from '../validation/workout'
 
-const Exercises = z.object({
-  id: z.number(),
-  name: z.string(),
-  muscle_group: z.string(),
-  equipment: z.string(),
-  sets: z.number().min(1),
-  reps: z.number().min(1),
-  weight_kg: z.number(),
-  rest_seconds: z.number().min(1),
-  notes: z.string()
-})
-
-const Workout = z.object({
-  id: z.number(),
-  author_id: z.string().min(15),
-  title: z.string().min(10),
-  category: z.string(),
-  duration_minutes: z.number().min(1),
-  difficulty: z.string(),
-  exercise_count: z.number().min(1),
-  rest_between_sets_seconds: z.number().min(30),
-  equipment: z.array(z.string()),
-  exercises: z.array(Exercises)
-})
-
-type Workouts = z.infer<typeof Workout>
 
 let workouts = [
 
@@ -104,7 +79,7 @@ const createWorkout = async (req: Request, res: Response, next: NextFunction) =>
 
     const workout = await createWorkoutService(req.body)
 
-    const zoddedWorkout = Workout.parse(workout)
+    const zoddedWorkout = WorkoutVal.parse(workout)
 
     workouts.push(zoddedWorkout)
     
@@ -115,7 +90,7 @@ const deleteWorkout = (req: Request, res: Response, next: NextFunction) => {
 
     const requestId: number = parseInt(req.params.id as string)
 
-    const deleteId = workouts.findIndex((workout: Workouts) => {
+    const deleteId = workouts.findIndex((workout: Workout) => {
         return workout.id === requestId
     })
 

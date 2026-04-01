@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import Workouts from '../models/workouts.model';
+import { Workout } from '../validation/workout'
 
 let workouts = [
 
@@ -64,7 +64,7 @@ let workouts = [
 
 ];
 
-const createWorkoutService = (data: Workouts) => {
+const createWorkoutService = (data: Workout) => {
 
     const objectExists = workouts.some((workout: object) => _.isEqual(workout, data))
 

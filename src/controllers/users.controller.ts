@@ -1,13 +1,6 @@
-import { NextFunction, Request, Response } from "express" 
-import z from 'zod'
+import { NextFunction, Request, Response } from "express"
 import createUserService from "../services/users.services"
-
-const User = z.object({
-  id: z.number().min(3),
-  username: z.string().min(10)
-})
-
-type User = z.infer<typeof User>
+import { User, UserVal } from '../validation/user'
 
 let users = [
   {
@@ -32,7 +25,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     const user = await createUserService(req.body)
 
-    const zoddedUser = User.parse(user)
+    const zoddedUser = UserVal.parse(user)
 
     users.push(zoddedUser)
 
@@ -49,7 +42,7 @@ const editUser = (req: Request, res: Response, next: NextFunction) => {
         res.status(400).send({ message: `User with id ${userId} not found` })
     }
 
-    users[editIndex] = User.parse({
+    users[editIndex] = UserVal.parse({
         id: userId,
         username: req.body.username
     })

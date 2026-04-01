@@ -16,7 +16,7 @@ const globalErrorHandler = (err: Errback, req: Request, res: Response, next: Nex
 
         return res.status(400).json({ errors })
     }
-    console.log(err)
+    return res.status(400).json({ err })
     console.log("---------------")
     next();
 }

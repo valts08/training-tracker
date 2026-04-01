@@ -1,4 +1,4 @@
-import Users from "../models/users.model"
+import { User } from '../validation/user'
 
 let users = [
   {
@@ -15,7 +15,7 @@ let users = [
   }
 ]
 
-const createUserService = (data: Users) => {
+const createUserService = (data: User) => {
     const idExists = users.some(user => user.id === data.id)
     const usernameExists = users.some(user => user.username === data.username)
 
